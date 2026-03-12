@@ -3,10 +3,13 @@ package com.cardmanager.service.impl;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.context.AnalysisContext;
+import com.alibaba.excel.event.AnalysisEventListener;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cardmanager.common.Constants;
 import com.cardmanager.common.PageResult;
+import com.cardmanager.dto.CardBatchVerifyExcelDTO;
 import com.cardmanager.dto.CardVerifyDTO;
 import com.cardmanager.dto.VerifyQueryDTO;
 import com.cardmanager.entity.CardInfo;
@@ -16,6 +19,7 @@ import com.cardmanager.mapper.CardInfoMapper;
 import com.cardmanager.security.UserContext;
 import com.cardmanager.service.VerifyService;
 import com.cardmanager.util.BusinessLogger;
+import com.cardmanager.vo.CardBatchVerifyResultVO;
 import com.cardmanager.vo.CardVO;
 import com.cardmanager.vo.PublicCardVO;
 import com.cardmanager.vo.VerifyHistoryExportVO;
@@ -24,13 +28,14 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,6 +51,27 @@ public class VerifyServiceImpl implements VerifyService {
 
     @Autowired
     private CardBatchMapper cardBatchMapper;
+
+    /**
+     * Excel读取监听器
+     */
+    private static class BatchVerifyExcelListener extends AnalysisEventListener<CardBatchVerifyExcelDTO> {
+        private final List<CardBatchVerifyExcelDTO> dataList = new ArrayList<>();
+
+        @Override
+        public void invoke(CardBatchVerifyExcelDTO data, AnalysisContext context) {
+            dataList.add(data);
+        }
+
+        @Override
+        public void doAfterAllAnalysed(AnalysisContext context) {
+            // 所有数据解析完成
+        }
+
+        public List<CardBatchVerifyExcelDTO> getDataList() {
+            return dataList;
+        }
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -86,6 +112,119 @@ public class VerifyServiceImpl implements VerifyService {
         // 记录业务日志
         BusinessLogger.logCardVerify(dto.getCardNumber(), card.getBatchNumber(), operatorId, operatorName);
         log.info("卡密核销成功: cardNumber={}, operator={}", dto.getCardNumber(), operatorName);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public CardBatchVerifyResultVO batchVerifyCard(MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new BusinessException("上传文件不能为空");
+        }
+
+        // 读取Excel文件
+        List<CardBatchVerifyExcelDTO> excelData;
+        try {
+            BatchVerifyExcelListener listener = new BatchVerifyExcelListener();
+            EasyExcel.read(file.getInputStream(), CardBatchVerifyExcelDTO.class, listener).sheet().doRead();
+            excelData = listener.getDataList();
+        } catch (IOException e) {
+            log.error("读取Excel文件失败", e);
+            throw new BusinessException("读取Excel文件失败，请检查文件格式");
+        }
+
+        if (excelData.isEmpty()) {
+            throw new BusinessException("Excel文件中没有数据");
+        }
+
+        // 获取当前用户信息
+        Long operatorId = UserContext.getUserId();
+        String operatorName = UserContext.getRealName();
+
+        int totalCount = excelData.size();
+        int successCount = 0;
+        List<CardBatchVerifyResultVO.FailDetail> failDetails = new ArrayList<>();
+
+        // 逐条处理核销
+        for (int i = 0; i < excelData.size(); i++) {
+            CardBatchVerifyExcelDTO item = excelData.get(i);
+            int rowIndex = i + 2; // Excel行号从1开始，加上表头行
+
+            try {
+                // 验证数据格式
+                if (StrUtil.isBlank(item.getCardNumber())) {
+                    throw new BusinessException("卡号不能为空");
+                }
+                if (StrUtil.isBlank(item.getCardPassword())) {
+                    throw new BusinessException("密码不能为空");
+                }
+                if (!item.getCardNumber().matches("^\\d{9}$")) {
+                    throw new BusinessException("卡号格式错误，必须为9位数字");
+                }
+                if (!item.getCardPassword().matches("^[A-Z0-9]{6}$")) {
+                    throw new BusinessException("密码格式错误，必须为6位字母数字");
+                }
+
+                // 查询卡密
+                CardInfo card = cardInfoMapper.selectByCardNumber(item.getCardNumber());
+                if (card == null) {
+                    throw new BusinessException("卡密不存在");
+                }
+
+                // 验证密码
+                if (!card.getCardPassword().equals(item.getCardPassword())) {
+                    throw new BusinessException("卡号或密码错误");
+                }
+
+                // 检查状态
+                if (card.getStatus() == Constants.CardStatus.USED) {
+                    throw new BusinessException("卡密已被核销");
+                }
+                if (card.getStatus() == Constants.CardStatus.RECYCLED) {
+                    throw new BusinessException("卡密已被回收");
+                }
+
+                // 更新卡密状态
+                card.setStatus(Constants.CardStatus.USED);
+                card.setUseTime(LocalDateTime.now());
+                card.setUseOperatorId(operatorId);
+                card.setUseOperatorName(operatorName);
+                cardInfoMapper.updateById(card);
+
+                // 更新批次已核销数量
+                cardBatchMapper.incrementUsedCount(card.getBatchNumber());
+
+                // 记录业务日志
+                BusinessLogger.logCardVerify(item.getCardNumber(), card.getBatchNumber(), operatorId, operatorName);
+                successCount++;
+                log.info("批量核销成功: cardNumber={}, operator={}", item.getCardNumber(), operatorName);
+
+            } catch (BusinessException e) {
+                failDetails.add(CardBatchVerifyResultVO.FailDetail.builder()
+                        .rowIndex(rowIndex)
+                        .cardNumber(item.getCardNumber())
+                        .reason(e.getMessage())
+                        .build());
+                log.warn("批量核销失败: row={}, cardNumber={}, reason={}", rowIndex, item.getCardNumber(), e.getMessage());
+            } catch (Exception e) {
+                failDetails.add(CardBatchVerifyResultVO.FailDetail.builder()
+                        .rowIndex(rowIndex)
+                        .cardNumber(item.getCardNumber())
+                        .reason("系统错误")
+                        .build());
+                log.error("批量核销系统错误: row={}, cardNumber={}", rowIndex, item.getCardNumber(), e);
+            }
+        }
+
+        // 记录批量核销日志
+        BusinessLogger.logBatchVerify(totalCount, successCount, failDetails.size(), operatorId, operatorName);
+        log.info("批量核销完成: total={}, success={}, fail={}", totalCount, successCount, failDetails.size());
+
+        return CardBatchVerifyResultVO.builder()
+                .totalCount(totalCount)
+                .successCount(successCount)
+                .failCount(failDetails.size())
+                .failDetails(failDetails)
+                .build();
     }
 
     @Override

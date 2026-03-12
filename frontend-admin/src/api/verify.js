@@ -33,3 +33,19 @@ export function exportVerifyHistory(params) {
     responseType: 'blob',
   })
 }
+
+/**
+ * 批量核销卡密
+ */
+export function batchVerifyCard(file) {
+  const formData = new FormData()
+  formData.append('file', file)
+  return request({
+    url: '/verify/batch',
+    method: 'post',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
