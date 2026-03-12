@@ -33,7 +33,7 @@ EXPOSE 8080
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-    CMD wget -q --spider http://localhost:8080/api/health || exit 1
+    CMD wget -q --spider http://localhost:8080/health || exit 1
 
 # 启动命令
-ENTRYPOINT ["java", "-jar", "-Xms256m", "-Xmx512m", "-Djava.security.egd=file:/dev/./urandom", "app.jar"]
+ENTRYPOINT ["java", "-jar", "-Xms128m", "-Xmx256m", "-Djava.security.egd=file:/dev/./urandom", "app.jar"]

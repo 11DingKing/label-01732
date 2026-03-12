@@ -7,11 +7,13 @@ import com.cardmanager.common.Result;
 import com.cardmanager.dto.CardVerifyDTO;
 import com.cardmanager.dto.VerifyQueryDTO;
 import com.cardmanager.service.VerifyService;
+import com.cardmanager.vo.CardBatchVerifyResultVO;
 import com.cardmanager.vo.CardVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,6 +36,16 @@ public class VerifyController {
     public Result<Void> verifyCard(@RequestBody @Validated CardVerifyDTO dto) {
         verifyService.verifyCard(dto);
         return Result.success("核销成功", null);
+    }
+
+    /**
+     * 批量核销卡密
+     */
+    @PostMapping("/batch")
+    @OperationLog(module = Constants.LogModule.VERIFY, operation = Constants.LogOperation.BATCH_VERIFY)
+    public Result<CardBatchVerifyResultVO> batchVerifyCard(@RequestParam("file") MultipartFile file) {
+        CardBatchVerifyResultVO result = verifyService.batchVerifyCard(file);
+        return Result.success("批量核销完成", result);
     }
 
     /**
