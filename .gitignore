@@ -1,0 +1,71 @@
+# =============================================
+# 游戏卡密管理系统 - Git 忽略文件
+# =============================================
+
+# ==================== 通用 ====================
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ==================== IDE ====================
+.idea/
+*.iml
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
+
+# ==================== 后端 (Java/Maven) ====================
+backend/target/
+backend/*.class
+backend/*.jar
+backend/*.war
+backend/logs/
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+
+# ==================== 前端 (Node.js/Vue) ====================
+frontend-admin/node_modules/
+frontend-admin/dist/
+frontend-admin/.env.local
+frontend-admin/.env.*.local
+frontend-admin/npm-debug.log*
+frontend-admin/yarn-debug.log*
+frontend-admin/yarn-error.log*
+frontend-admin/pnpm-debug.log*
+frontend-admin/.npm/
+frontend-admin/.yarn/
+
+# ==================== Docker ====================
+docker-compose.override.yml
+.docker/
+
+# ==================== 环境配置 ====================
+.env
+.env.local
+.env.*.local
+*.env
+
+# ==================== 敏感文件 ====================
+*.pem
+*.key
+*.p12
+credentials.json
+secrets.json
+
+# ==================== 测试 ====================
+coverage/
+*.coverage
+.nyc_output/
+
+# ==================== 其他 ====================
+*.bak
+*.backup

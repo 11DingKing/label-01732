@@ -1,0 +1,52 @@
+# =============================================
+# 测试环境配置
+# =============================================
+
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  
+  h2:
+    console:
+      enabled: true
+  
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema-test.sql
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.cardmanager.entity
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+
+# JWT 配置
+jwt:
+  secret: test-jwt-secret-key-for-unit-testing-purpose-only
+  expiration: 86400000
+  header: Authorization
+  prefix: "Bearer "
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.cardmanager: DEBUG

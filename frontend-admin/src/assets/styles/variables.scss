@@ -1,0 +1,189 @@
+// =============================================
+// 设计系统 - 变量定义
+// 参考 Ant Design / Element Plus Pro 设计规范
+// =============================================
+
+// ==================== 色彩体系 ====================
+
+// 品牌色
+$primary-color: #1890ff;
+$primary-light: #40a9ff;
+$primary-lighter: #69c0ff;
+$primary-lightest: #e6f7ff;
+$primary-dark: #096dd9;
+$primary-darker: #0050b3;
+
+// 功能色
+$success-color: #52c41a;
+$success-light: #95de64;
+$success-bg: #f6ffed;
+
+$warning-color: #faad14;
+$warning-light: #ffc53d;
+$warning-bg: #fffbe6;
+
+$danger-color: #ff4d4f;
+$danger-light: #ff7875;
+$danger-bg: #fff2f0;
+
+$info-color: #1890ff;
+$info-light: #69c0ff;
+$info-bg: #e6f7ff;
+
+// 中性色
+$text-primary: #1f2329;
+$text-regular: #4e5969;
+$text-secondary: #86909c;
+$text-disabled: #c9cdd4;
+$text-placeholder: #c9cdd4;
+
+// 边框色
+$border-color: #e5e6eb;
+$border-light: #f2f3f5;
+$border-dark: #c9cdd4;
+
+// 填充色
+$fill-base: #f7f8fa;
+$fill-light: #f2f3f5;
+$fill-lighter: #fafafa;
+$fill-white: #ffffff;
+
+// 背景色
+$bg-base: #f0f2f5;
+$bg-light: #f7f8fa;
+$bg-page: #f5f7fa;
+$bg-white: #ffffff;
+
+// 遮罩色
+$mask-bg: rgba(0, 0, 0, 0.45);
+$mask-light: rgba(0, 0, 0, 0.25);
+
+// ==================== 字体系统 ====================
+
+$font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+  'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+  'Noto Color Emoji';
+
+$font-family-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+
+// 字体大小
+$font-size-xs: 12px;
+$font-size-sm: 13px;
+$font-size-base: 14px;
+$font-size-md: 16px;
+$font-size-lg: 18px;
+$font-size-xl: 20px;
+$font-size-2xl: 24px;
+$font-size-3xl: 30px;
+
+// 字重
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// 行高
+$line-height-tight: 1.25;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.75;
+
+// ==================== 间距系统 ====================
+
+$spacing-none: 0;
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 12px;
+$spacing-base: 16px;
+$spacing-lg: 20px;
+$spacing-xl: 24px;
+$spacing-2xl: 32px;
+$spacing-3xl: 40px;
+$spacing-4xl: 48px;
+
+// ==================== 圆角系统 ====================
+
+$radius-none: 0;
+$radius-sm: 2px;
+$radius-base: 4px;
+$radius-md: 6px;
+$radius-lg: 8px;
+$radius-xl: 12px;
+$radius-2xl: 16px;
+$radius-full: 9999px;
+
+// ==================== 阴影系统 ====================
+
+$shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+$shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+$shadow-base: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+$shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+// 特殊阴影
+$shadow-card: 0 1px 2px -2px rgba(0, 0, 0, 0.16), 0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09);
+$shadow-drawer: -6px 0 16px -8px rgba(0, 0, 0, 0.08), -9px 0 28px 0 rgba(0, 0, 0, 0.05), -12px 0 48px 16px rgba(0, 0, 0, 0.03);
+$shadow-modal: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+
+// ==================== 过渡动画 ====================
+
+$transition-fast: 0.1s;
+$transition-base: 0.2s;
+$transition-slow: 0.3s;
+$transition-slower: 0.5s;
+
+$ease-in: cubic-bezier(0.4, 0, 1, 1);
+$ease-out: cubic-bezier(0, 0, 0.2, 1);
+$ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+$ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+// ==================== 布局相关 ====================
+
+$sidebar-width: 220px;
+$sidebar-collapsed-width: 64px;
+$header-height: 56px;
+$page-padding: 24px;
+
+// ==================== 断点 ====================
+
+$breakpoint-xs: 480px;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+$breakpoint-2xl: 1600px;
+
+// ==================== Z-index ====================
+
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;
+
+// ==================== 高级动画曲线 ====================
+
+$ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+$ease-smooth: cubic-bezier(0.23, 1, 0.32, 1);
+$ease-elastic: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+
+// ==================== 渐变预设 ====================
+
+$gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+$gradient-warning: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+$gradient-danger: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+$gradient-info: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+$gradient-dark: linear-gradient(135deg, #232526 0%, #414345 100%);
+$gradient-purple: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$gradient-ocean: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+$gradient-sunset: linear-gradient(135deg, #ff6a88 0%, #ff99ac 100%);
+
+// ==================== 玻璃态效果 ====================
+
+$glass-bg: rgba(255, 255, 255, 0.8);
+$glass-bg-dark: rgba(0, 0, 0, 0.4);
+$glass-blur: blur(20px);
+$glass-border: 1px solid rgba(255, 255, 255, 0.18);
