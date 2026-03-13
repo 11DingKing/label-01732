@@ -1,11 +1,8 @@
 package com.cardmanager.exception;
 
-import lombok.Getter;
-
 /**
  * 业务异常
  */
-@Getter
 public class BusinessException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
@@ -28,5 +25,14 @@ public class BusinessException extends RuntimeException {
         super(message);
         this.code = code;
         this.message = message;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
     }
 }

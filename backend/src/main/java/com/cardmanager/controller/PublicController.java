@@ -3,7 +3,8 @@ package com.cardmanager.controller;
 import com.cardmanager.common.Result;
 import com.cardmanager.service.VerifyService;
 import com.cardmanager.vo.PublicCardVO;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,10 +13,11 @@ import javax.validation.constraints.NotBlank;
 /**
  * 公开查询控制器（无需登录）
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/public")
 public class PublicController {
+
+    private static final Logger log = LoggerFactory.getLogger(PublicController.class);
 
     @Autowired
     private VerifyService verifyService;

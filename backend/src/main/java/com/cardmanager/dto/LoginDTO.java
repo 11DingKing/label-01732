@@ -1,14 +1,11 @@
 package com.cardmanager.dto;
 
-import lombok.Data;
-
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 /**
  * 登录请求DTO
  */
-@Data
 public class LoginDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -24,4 +21,20 @@ public class LoginDTO implements Serializable {
      */
     @NotBlank(message = "密码不能为空")
     private String password;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

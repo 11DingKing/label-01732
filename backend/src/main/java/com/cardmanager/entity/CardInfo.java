@@ -1,7 +1,6 @@
 package com.cardmanager.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -9,7 +8,6 @@ import java.time.LocalDateTime;
 /**
  * 卡密信息实体
  */
-@Data
 @TableName("card_info")
 public class CardInfo implements Serializable {
 
@@ -77,4 +75,100 @@ public class CardInfo implements Serializable {
      */
     @TableLogic
     private Integer isDeleted;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
+    public String getCardPassword() {
+        return cardPassword;
+    }
+
+    public void setCardPassword(String cardPassword) {
+        this.cardPassword = cardPassword;
+    }
+
+    public String getBatchNumber() {
+        return batchNumber;
+    }
+
+    public void setBatchNumber(String batchNumber) {
+        this.batchNumber = batchNumber;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Long getCreateOperatorId() {
+        return createOperatorId;
+    }
+
+    public void setCreateOperatorId(Long createOperatorId) {
+        this.createOperatorId = createOperatorId;
+    }
+
+    public String getCreateOperatorName() {
+        return createOperatorName;
+    }
+
+    public void setCreateOperatorName(String createOperatorName) {
+        this.createOperatorName = createOperatorName;
+    }
+
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
+
+    public LocalDateTime getUseTime() {
+        return useTime;
+    }
+
+    public void setUseTime(LocalDateTime useTime) {
+        this.useTime = useTime;
+    }
+
+    public Long getUseOperatorId() {
+        return useOperatorId;
+    }
+
+    public void setUseOperatorId(Long useOperatorId) {
+        this.useOperatorId = useOperatorId;
+    }
+
+    public String getUseOperatorName() {
+        return useOperatorName;
+    }
+
+    public void setUseOperatorName(String useOperatorName) {
+        this.useOperatorName = useOperatorName;
+    }
+
+    public Integer getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Integer isDeleted) {
+        this.isDeleted = isDeleted;
+    }
 }

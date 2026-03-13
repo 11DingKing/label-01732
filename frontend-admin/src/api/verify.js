@@ -1,14 +1,14 @@
-import request from '@/utils/request'
+import request from "@/utils/request";
 
 /**
  * 核销卡密
  */
 export function verifyCard(data) {
   return request({
-    url: '/verify/use',
-    method: 'post',
+    url: "/verify/use",
+    method: "post",
     data,
-  })
+  });
 }
 
 /**
@@ -16,10 +16,10 @@ export function verifyCard(data) {
  */
 export function getVerifyHistory(params) {
   return request({
-    url: '/verify/history',
-    method: 'get',
+    url: "/verify/history",
+    method: "get",
     params,
-  })
+  });
 }
 
 /**
@@ -27,9 +27,23 @@ export function getVerifyHistory(params) {
  */
 export function exportVerifyHistory(params) {
   return request({
-    url: '/verify/export',
-    method: 'get',
+    url: "/verify/export",
+    method: "get",
     params,
-    responseType: 'blob',
-  })
+    responseType: "blob",
+  });
+}
+
+/**
+ * 批量核销卡密
+ */
+export function verifyCardBatch(data) {
+  return request({
+    url: "/verify/batch",
+    method: "post",
+    data,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 }

@@ -1,7 +1,8 @@
 package com.cardmanager.config;
 
 import com.cardmanager.exception.BusinessException;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -17,9 +18,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 频率限制拦截器
  * 用于防止公开接口被滥用
  */
-@Slf4j
 @Component
 public class RateLimitInterceptor implements HandlerInterceptor {
+
+    private static final Logger log = LoggerFactory.getLogger(RateLimitInterceptor.class);
 
     @Value("${rate-limit.public-query:10}")
     private int maxRequestsPerMinute;

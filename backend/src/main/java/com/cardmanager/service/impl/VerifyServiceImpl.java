@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cardmanager.common.Constants;
 import com.cardmanager.common.PageResult;
 import com.cardmanager.dto.CardVerifyDTO;
+import com.cardmanager.dto.CardVerifyBatchDTO;
 import com.cardmanager.dto.VerifyQueryDTO;
 import com.cardmanager.entity.CardInfo;
 import com.cardmanager.exception.BusinessException;
@@ -17,9 +18,11 @@ import com.cardmanager.security.UserContext;
 import com.cardmanager.service.VerifyService;
 import com.cardmanager.util.BusinessLogger;
 import com.cardmanager.vo.CardVO;
+import com.cardmanager.vo.CardVerifyBatchResultVO;
 import com.cardmanager.vo.PublicCardVO;
 import com.cardmanager.vo.VerifyHistoryExportVO;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,16 +33,17 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * 核销服务实现
  */
-@Slf4j
 @Service
 public class VerifyServiceImpl implements VerifyService {
+
+    private static final Logger log = LoggerFactory.getLogger(VerifyServiceImpl.class);
 
     @Autowired
     private CardInfoMapper cardInfoMapper;
@@ -86,6 +90,86 @@ public class VerifyServiceImpl implements VerifyService {
         // 记录业务日志
         BusinessLogger.logCardVerify(dto.getCardNumber(), card.getBatchNumber(), operatorId, operatorName);
         log.info("卡密核销成功: cardNumber={}, operator={}", dto.getCardNumber(), operatorName);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public CardVerifyBatchResultVO verifyCardBatch(List<CardVerifyBatchDTO> list) {
+        CardVerifyBatchResultVO result = new CardVerifyBatchResultVO();
+        List<String> successCards = new ArrayList<>();
+        List<CardVerifyBatchResultVO.FailDetail> failDetails = new ArrayList<>();
+
+        // 获取当前用户信息
+        Long operatorId = UserContext.getUserId();
+        String operatorName = UserContext.getRealName();
+
+        for (CardVerifyBatchDTO item : list) {
+            try {
+                // 校验必填字段
+                if (StrUtil.isBlank(item.getCardNumber())) {
+                    throw new BusinessException("卡号不能为空");
+                }
+                if (StrUtil.isBlank(item.getCardPassword())) {
+                    throw new BusinessException("密码不能为空");
+                }
+
+                // 查询卡密
+                CardInfo card = cardInfoMapper.selectByCardNumber(item.getCardNumber());
+                if (card == null) {
+                    throw new BusinessException("卡密不存在");
+                }
+
+                // 验证密码
+                if (!card.getCardPassword().equals(item.getCardPassword())) {
+                    throw new BusinessException("卡号或密码错误");
+                }
+
+                // 检查状态
+                if (card.getStatus() == Constants.CardStatus.USED) {
+                    throw new BusinessException("卡密已被核销");
+                }
+                if (card.getStatus() == Constants.CardStatus.RECYCLED) {
+                    throw new BusinessException("卡密已被回收");
+                }
+
+                // 更新卡密状态
+                card.setStatus(Constants.CardStatus.USED);
+                card.setUseTime(LocalDateTime.now());
+                card.setUseOperatorId(operatorId);
+                card.setUseOperatorName(operatorName);
+                cardInfoMapper.updateById(card);
+
+                // 更新批次已核销数量
+                cardBatchMapper.incrementUsedCount(card.getBatchNumber());
+
+                // 记录成功
+                successCards.add(item.getCardNumber());
+                log.info("批量核销-卡密核销成功: cardNumber={}, operator={}", item.getCardNumber(), operatorName);
+
+            } catch (Exception e) {
+                // 记录失败
+                failDetails.add(new CardVerifyBatchResultVO.FailDetail(
+                        item.getCardNumber(),
+                        item.getRowNum(),
+                        e.getMessage()
+                ));
+                log.warn("批量核销-卡密核销失败: cardNumber={}, reason={}", item.getCardNumber(), e.getMessage());
+            }
+        }
+
+        // 设置结果
+        result.setTotalCount(list.size());
+        result.setSuccessCount(successCards.size());
+        result.setFailCount(failDetails.size());
+        result.setSuccessCards(successCards);
+        result.setFailDetails(failDetails);
+
+        // 记录业务日志
+        if (!successCards.isEmpty()) {
+            BusinessLogger.logCardVerifyBatch(successCards.size(), operatorId, operatorName);
+        }
+
+        return result;
     }
 
     @Override

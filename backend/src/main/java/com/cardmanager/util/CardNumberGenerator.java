@@ -1,7 +1,8 @@
 package com.cardmanager.util;
 
 import cn.hutool.core.util.RandomUtil;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -29,8 +30,9 @@ import java.util.concurrent.ThreadLocalRandom;
  * </ol>
  * </p>
  */
-@Slf4j
 public class CardNumberGenerator {
+
+    private static final Logger log = LoggerFactory.getLogger(CardNumberGenerator.class);
 
     private CardNumberGenerator() {
     }

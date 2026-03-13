@@ -36,6 +36,16 @@ public class BusinessLogger {
     }
 
     /**
+     * 记录批量核销操作日志
+     */
+    public static void logCardVerifyBatch(int count, Long operatorId, String operatorName) {
+        setMDC(operatorId, operatorName);
+        BUSINESS_LOG.info("[批量核销] 成功数量={}, 操作员ID={}, 操作员={}",
+            count, operatorId, operatorName);
+        clearMDC();
+    }
+
+    /**
      * 记录卡密回收操作日志
      */
     public static void logCardRecycle(String cardNumber, String batchNumber, Long operatorId, String operatorName) {
