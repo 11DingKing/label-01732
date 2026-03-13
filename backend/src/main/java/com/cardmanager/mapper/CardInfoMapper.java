@@ -61,6 +61,14 @@ public interface CardInfoMapper extends BaseMapper<CardInfo> {
     Set<String> selectExistingCardNumbers(@Param("cardNumbers") Set<String> cardNumbers);
 
     /**
+     * 根据卡号列表批量查询
+     */
+    @Select("<script>SELECT * FROM card_info WHERE card_number IN " +
+            "<foreach collection='cardNumbers' item='cardNumber' open='(' separator=',' close=')'>" +
+            "#{cardNumber}</foreach> AND is_deleted = 0</script>")
+    List<CardInfo> selectByCardNumbers(@Param("cardNumbers") List<String> cardNumbers);
+
+    /**
      * 批量插入卡密（高性能批量插入，使用 VALUES (...), (...) 语法）
      * @param cardList 卡密列表
      * @return 插入条数
