@@ -11,7 +11,8 @@ import com.cardmanager.security.UserContext;
 import com.cardmanager.service.CardService;
 import com.cardmanager.vo.CardBatchVO;
 import com.cardmanager.vo.CardVO;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -22,10 +23,11 @@ import java.util.List;
 /**
  * 卡密管理控制器
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/card")
 public class CardController {
+
+    private static final Logger log = LoggerFactory.getLogger(CardController.class);
 
     @Autowired
     private CardService cardService;

@@ -10,7 +10,8 @@ import com.cardmanager.exception.BusinessException;
 import com.cardmanager.security.UserContext;
 import com.cardmanager.service.UserService;
 import com.cardmanager.vo.UserVO;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +19,11 @@ import org.springframework.web.bind.annotation.*;
 /**
  * 用户管理控制器
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
+
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private UserService userService;

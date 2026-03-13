@@ -7,7 +7,7 @@
           <el-icon><CircleCheck /></el-icon>
           卡密核销
         </h2>
-        <p class="page-subtitle">输入卡号和密码完成核销</p>
+        <p class="page-subtitle">支持单张核销和Excel批量核销</p>
       </div>
     </div>
     
@@ -28,80 +28,157 @@
                 </div>
               </div>
               <h3 class="verify-title">卡密核销</h3>
-              <p class="verify-subtitle">输入卡号和密码完成核销</p>
+              <p class="verify-subtitle">选择核销方式完成操作</p>
             </div>
             
-            <el-form
-              ref="formRef"
-              :model="form"
-              :rules="rules"
-              label-position="top"
-              class="verify-form"
-              @keyup.enter="handleVerify"
-            >
-              <el-form-item label="卡号" prop="cardNumber">
-                <el-input
-                  v-model="form.cardNumber"
-                  placeholder="请输入9位卡号"
-                  size="large"
-                  maxlength="9"
-                  @focus="inputFocus = 'cardNumber'"
-                  @blur="inputFocus = ''"
-                  :class="{ 'input-focused': inputFocus === 'cardNumber' }"
+            <!-- 核销方式切换 -->
+            <el-tabs v-model="activeTab" class="verify-tabs">
+              <el-tab-pane label="单张核销" name="single">
+                <el-form
+                  ref="formRef"
+                  :model="form"
+                  :rules="rules"
+                  label-position="top"
+                  class="verify-form"
+                  @keyup.enter="handleVerify"
                 >
-                  <template #prefix>
-                    <el-icon><Postcard /></el-icon>
-                  </template>
-                  <template #suffix>
-                    <span class="input-counter">
-                      {{ form.cardNumber.length }}/9
-                    </span>
-                  </template>
-                </el-input>
-              </el-form-item>
+                  <el-form-item label="卡号" prop="cardNumber">
+                    <el-input
+                      v-model="form.cardNumber"
+                      placeholder="请输入9位卡号"
+                      size="large"
+                      maxlength="9"
+                      @focus="inputFocus = 'cardNumber'"
+                      @blur="inputFocus = ''"
+                      :class="{ 'input-focused': inputFocus === 'cardNumber' }"
+                    >
+                      <template #prefix>
+                        <el-icon><Postcard /></el-icon>
+                      </template>
+                      <template #suffix>
+                        <span class="input-counter">
+                          {{ form.cardNumber.length }}/9
+                        </span>
+                      </template>
+                    </el-input>
+                  </el-form-item>
+                  
+                  <el-form-item label="密码" prop="cardPassword">
+                    <el-input
+                      v-model="form.cardPassword"
+                      placeholder="请输入6位密码"
+                      size="large"
+                      maxlength="6"
+                      @input="handlePasswordInput"
+                      @focus="inputFocus = 'cardPassword'"
+                      @blur="inputFocus = ''"
+                      :class="{ 'input-focused': inputFocus === 'cardPassword' }"
+                    >
+                      <template #prefix>
+                        <el-icon><Lock /></el-icon>
+                      </template>
+                      <template #suffix>
+                        <span class="input-counter">
+                          {{ form.cardPassword.length }}/6
+                        </span>
+                      </template>
+                    </el-input>
+                  </el-form-item>
+                  
+                  <el-form-item>
+                    <el-button
+                      type="primary"
+                      size="large"
+                      :loading="loading"
+                      :disabled="!canSubmit"
+                      class="verify-btn ripple-btn"
+                      @click="handleVerify"
+                    >
+                      <template v-if="!loading">
+                        <el-icon class="btn-icon"><CircleCheck /></el-icon>
+                        确认核销
+                      </template>
+                      <template v-else>
+                        <span class="loading-spinner"></span>
+                        核销中
+                      </template>
+                    </el-button>
+                  </el-form-item>
+                </el-form>
+              </el-tab-pane>
               
-              <el-form-item label="密码" prop="cardPassword">
-                <el-input
-                  v-model="form.cardPassword"
-                  placeholder="请输入6位密码"
-                  size="large"
-                  maxlength="6"
-                  @input="handlePasswordInput"
-                  @focus="inputFocus = 'cardPassword'"
-                  @blur="inputFocus = ''"
-                  :class="{ 'input-focused': inputFocus === 'cardPassword' }"
-                >
-                  <template #prefix>
-                    <el-icon><Lock /></el-icon>
-                  </template>
-                  <template #suffix>
-                    <span class="input-counter">
-                      {{ form.cardPassword.length }}/6
-                    </span>
-                  </template>
-                </el-input>
-              </el-form-item>
-              
-              <el-form-item>
-                <el-button
-                  type="primary"
-                  size="large"
-                  :loading="loading"
-                  :disabled="!canSubmit"
-                  class="verify-btn ripple-btn"
-                  @click="handleVerify"
-                >
-                  <template v-if="!loading">
-                    <el-icon class="btn-icon"><CircleCheck /></el-icon>
-                    确认核销
-                  </template>
-                  <template v-else>
-                    <span class="loading-spinner"></span>
-                    核销中
-                  </template>
-                </el-button>
-              </el-form-item>
-            </el-form>
+              <el-tab-pane label="批量核销" name="batch">
+                <div class="batch-verify-form">
+                  <div class="upload-area">
+                    <el-upload
+                      ref="uploadRef"
+                      :action="uploadUrl"
+                      :headers="uploadHeaders"
+                      :on-success="handleUploadSuccess"
+                      :on-error="handleUploadError"
+                      :before-upload="beforeUpload"
+                      :show-file-list="false"
+                      accept=".xlsx,.xls"
+                      :disabled="loading"
+                    >
+                      <div class="upload-content">
+                        <div class="upload-icon">
+                          <el-icon><UploadFilled /></el-icon>
+                        </div>
+                        <p class="upload-text">点击或拖拽上传Excel文件</p>
+                        <p class="upload-hint">支持 .xlsx、.xls 格式，第一列为卡号，第二列为密码</p>
+                      </div>
+                    </el-upload>
+                  </div>
+                  
+                  <div v-if="uploadedFile" class="file-info">
+                    <el-icon class="file-icon"><Document /></el-icon>
+                    <span class="file-name">{{ uploadedFile.name }}</span>
+                    <el-button 
+                      type="danger" 
+                      size="small" 
+                      text 
+                      @click="clearFile"
+                    >
+                      移除
+                    </el-button>
+                  </div>
+                  
+                  <div class="batch-tips">
+                    <el-alert
+                      title="Excel格式要求"
+                      type="info"
+                      :closable="false"
+                      show-icon
+                    >
+                      <template #default>
+                        <p>• 第一列为：卡号（9位数字）</p>
+                        <p>• 第二列为：密码（6位字母数字）</p>
+                        <p>• 第一行为表头，从第二行开始读取数据</p>
+                      </template>
+                    </el-alert>
+                  </div>
+                  
+                  <el-button
+                    type="primary"
+                    size="large"
+                    :loading="loading"
+                    :disabled="!uploadedFile"
+                    class="batch-verify-btn ripple-btn"
+                    @click="handleBatchVerify"
+                  >
+                    <template v-if="!loading">
+                      <el-icon class="btn-icon"><CircleCheck /></el-icon>
+                      开始批量核销
+                    </template>
+                    <template v-else>
+                      <span class="loading-spinner"></span>
+                      核销中
+                    </template>
+                  </el-button>
+                </div>
+              </el-tab-pane>
+            </el-tabs>
           </div>
         </transition>
       </el-col>
@@ -118,7 +195,8 @@
               </svg>
             </div>
             <h3 class="result-title">核销成功！</h3>
-            <p class="result-desc">卡号 <strong>{{ form.cardNumber }}</strong> 已成功核销</p>
+            <p class="result-desc" v-if="activeTab === 'single'">卡号 <strong>{{ form.cardNumber }}</strong> 已成功核销</p>
+            <p class="result-desc" v-else>共成功核销 <strong>{{ batchResult.successCount }}</strong> 张卡</p>
             <div class="result-time">
               <el-icon><Clock /></el-icon>
               {{ new Date().toLocaleString() }}
@@ -145,6 +223,61 @@
             <el-button type="primary" size="large" @click="result.visible = false" class="retry-btn">
               <el-icon><RefreshRight /></el-icon>
               重新输入
+            </el-button>
+          </div>
+          
+          <!-- 批量核销结果详情 -->
+          <div v-else-if="batchResultVisible" class="card batch-result-card" key="batch-result">
+            <div class="batch-result-header">
+              <h3>批量核销结果</h3>
+              <el-button type="primary" size="small" @click="downloadTemplate">
+                <el-icon><Download /></el-icon>
+                下载模板
+              </el-button>
+            </div>
+            
+            <div class="result-stats">
+              <div class="stat-item total">
+                <div class="stat-icon">
+                  <el-icon><Document /></el-icon>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-value">{{ batchResult.totalCount }}</div>
+                  <div class="stat-label">总计</div>
+                </div>
+              </div>
+              <div class="stat-item success">
+                <div class="stat-icon">
+                  <el-icon><CircleCheck /></el-icon>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-value">{{ batchResult.successCount }}</div>
+                  <div class="stat-label">成功</div>
+                </div>
+              </div>
+              <div class="stat-item fail">
+                <div class="stat-icon">
+                  <el-icon><Close /></el-icon>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-value">{{ batchResult.failCount }}</div>
+                  <div class="stat-label">失败</div>
+                </div>
+              </div>
+            </div>
+            
+            <div v-if="batchResult.failDetails && batchResult.failDetails.length > 0" class="fail-details">
+              <h4>失败详情</h4>
+              <el-table :data="batchResult.failDetails" size="small" border>
+                <el-table-column prop="rowNum" label="行号" width="80" align="center" />
+                <el-table-column prop="cardNumber" label="卡号" width="120" />
+                <el-table-column prop="reason" label="失败原因" show-overflow-tooltip />
+              </el-table>
+            </div>
+            
+            <el-button type="primary" size="large" @click="resetBatchForm" class="continue-btn">
+              <el-icon><RefreshRight /></el-icon>
+              继续核销
             </el-button>
           </div>
           
@@ -179,12 +312,17 @@
 
 <script setup>
 import { ref, reactive, computed } from 'vue'
-import { verifyCard } from '@/api/verify'
+import { verifyCard, verifyCardBatch } from '@/api/verify'
+import { getToken } from '@/utils/auth'
 import toast from '@/utils/toast'
 
 const formRef = ref(null)
+const uploadRef = ref(null)
 const loading = ref(false)
 const inputFocus = ref('')
+const activeTab = ref('single')
+const uploadedFile = ref(null)
+const batchResultVisible = ref(false)
 
 const form = reactive({
   cardNumber: '',
@@ -206,6 +344,20 @@ const result = reactive({
   visible: false,
   success: false,
   message: '',
+})
+
+const batchResult = reactive({
+  totalCount: 0,
+  successCount: 0,
+  failCount: 0,
+  successCards: [],
+  failDetails: [],
+})
+
+// 上传配置
+const uploadUrl = ref(import.meta.env.VITE_APP_BASE_API + '/verify/batch')
+const uploadHeaders = ref({
+  'Authorization': 'Bearer ' + getToken()
 })
 
 // 是否可以提交
@@ -259,6 +411,90 @@ const resetForm = () => {
   form.cardPassword = ''
   formRef.value?.resetFields()
 }
+
+// 批量核销相关方法
+const beforeUpload = (file) => {
+  const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
+                  file.type === 'application/vnd.ms-excel'
+  const isLt10M = file.size / 1024 / 1024 < 10
+  
+  if (!isExcel) {
+    toast.error('只能上传Excel文件')
+    return false
+  }
+  if (!isLt10M) {
+    toast.error('文件大小不能超过10MB')
+    return false
+  }
+  
+  uploadedFile.value = file
+  return false // 不自动上传，手动触发
+}
+
+const handleUploadSuccess = (response) => {
+  if (response.code === 200) {
+    Object.assign(batchResult, response.data)
+    batchResultVisible.value = true
+    result.visible = false
+    toast.notifySuccess('批量核销完成', `成功: ${batchResult.successCount}, 失败: ${batchResult.failCount}`)
+  } else {
+    toast.error(response.message || '批量核销失败')
+  }
+  loading.value = false
+}
+
+const handleUploadError = (error) => {
+  toast.error('上传失败，请重试')
+  loading.value = false
+}
+
+const handleBatchVerify = async () => {
+  if (!uploadedFile.value) {
+    toast.warning('请先上传Excel文件')
+    return
+  }
+  
+  loading.value = true
+  
+  const formData = new FormData()
+  formData.append('file', uploadedFile.value)
+  
+  try {
+    const response = await verifyCardBatch(formData)
+    if (response.code === 200) {
+      Object.assign(batchResult, response.data)
+      batchResultVisible.value = true
+      result.visible = false
+      toast.notifySuccess('批量核销完成', `成功: ${batchResult.successCount}, 失败: ${batchResult.failCount}`)
+    } else {
+      toast.error(response.message || '批量核销失败')
+    }
+  } catch (error) {
+    toast.error(error.message || '批量核销失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+const clearFile = () => {
+  uploadedFile.value = null
+  uploadRef.value?.clearFiles()
+}
+
+const resetBatchForm = () => {
+  batchResultVisible.value = false
+  clearFile()
+  batchResult.totalCount = 0
+  batchResult.successCount = 0
+  batchResult.failCount = 0
+  batchResult.successCards = []
+  batchResult.failDetails = []
+}
+
+const downloadTemplate = () => {
+  // 创建并下载Excel模板
+  toast.info('模板下载功能开发中')
+}
 </script>
 
 <style lang="scss" scoped>
@@ -276,7 +512,7 @@ const resetForm = () => {
   text-align: center;
   padding: $spacing-2xl;
   height: 100%;
-  min-height: 400px;
+  min-height: 500px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -471,13 +707,257 @@ const resetForm = () => {
   to { transform: rotate(360deg); }
 }
 
+// ==================== 批量核销样式 ====================
+
+.verify-tabs {
+  :deep(.el-tabs__nav-wrap) {
+    margin-bottom: $spacing-lg;
+  }
+  
+  :deep(.el-tabs__item) {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.batch-verify-form {
+  max-width: 360px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.upload-area {
+  margin-bottom: $spacing-base;
+  
+  :deep(.el-upload) {
+    width: 100%;
+  }
+}
+
+.upload-content {
+  border: 2px dashed $border-color;
+  border-radius: $radius-lg;
+  padding: $spacing-2xl;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s $ease-smooth;
+  
+  &:hover {
+    border-color: $primary-color;
+    background: rgba($primary-color, 0.02);
+  }
+}
+
+.upload-icon {
+  font-size: 48px;
+  color: $primary-color;
+  margin-bottom: $spacing-base;
+  
+  .el-icon {
+    font-size: 48px;
+  }
+}
+
+.upload-text {
+  font-size: $font-size-base;
+  color: $text-primary;
+  margin: 0 0 $spacing-xs;
+  font-weight: $font-weight-semibold;
+}
+
+.upload-hint {
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  margin: 0;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-base;
+  background: $fill-lighter;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-base;
+  
+  .file-icon {
+    color: $primary-color;
+    font-size: 18px;
+  }
+  
+  .file-name {
+    flex: 1;
+    font-size: $font-size-sm;
+    color: $text-primary;
+    word-break: break-all;
+  }
+}
+
+.batch-tips {
+  margin-bottom: $spacing-lg;
+}
+
+.batch-verify-btn {
+  width: 100%;
+  height: 48px;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-lg;
+  background: linear-gradient(135deg, $success-color 0%, darken($success-color, 10%) 100%);
+  border: none;
+  transition: all 0.3s $ease-smooth;
+  
+  .btn-icon {
+    margin-right: 8px;
+    transition: transform 0.3s $ease-spring;
+  }
+  
+  &:not(:disabled):hover {
+    box-shadow: 0 8px 25px rgba($success-color, 0.4);
+    
+    .btn-icon {
+      transform: scale(1.1);
+    }
+  }
+  
+  &:disabled {
+    background: $fill-light;
+    color: $text-disabled;
+    box-shadow: none;
+  }
+}
+
+// ==================== 批量核销结果卡片 ====================
+
+.batch-result-card {
+  padding: $spacing-xl;
+  height: 100%;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.batch-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-base;
+  border-bottom: 1px solid $border-light;
+  
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $text-primary;
+    margin: 0;
+  }
+}
+
+.result-stats {
+  display: flex;
+  gap: $spacing-base;
+  margin-bottom: $spacing-lg;
+}
+
+.stat-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-base;
+  border-radius: $radius-lg;
+  background: $fill-lighter;
+  
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    .el-icon {
+      font-size: 18px;
+    }
+  }
+  
+  .stat-content {
+    flex: 1;
+    
+    .stat-value {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      line-height: 1;
+    }
+    
+    .stat-label {
+      font-size: $font-size-xs;
+      color: $text-secondary;
+      margin-top: 2px;
+    }
+  }
+  
+  &.total {
+    .stat-icon {
+      background: rgba($primary-color, 0.1);
+      color: $primary-color;
+    }
+    
+    .stat-value {
+      color: $primary-color;
+    }
+  }
+  
+  &.success {
+    .stat-icon {
+      background: rgba($success-color, 0.1);
+      color: $success-color;
+    }
+    
+    .stat-value {
+      color: $success-color;
+    }
+  }
+  
+  &.fail {
+    .stat-icon {
+      background: rgba($danger-color, 0.1);
+      color: $danger-color;
+    }
+    
+    .stat-value {
+      color: $danger-color;
+    }
+  }
+}
+
+.fail-details {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  
+  h4 {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    margin: 0 0 $spacing-base;
+  }
+  
+  :deep(.el-table) {
+    flex: 1;
+    overflow: auto;
+    font-size: $font-size-xs;
+  }
+}
+
 // ==================== 结果卡片 ====================
 
 .result-card {
   text-align: center;
   padding: $spacing-3xl;
   height: 100%;
-  min-height: 400px;
+  min-height: 500px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -682,7 +1162,7 @@ const resetForm = () => {
 
 .tips-card {
   height: 100%;
-  min-height: 400px;
+  min-height: 500px;
   display: flex;
   flex-direction: column;
 }
@@ -853,16 +1333,6 @@ const resetForm = () => {
 
 @keyframes bounceOut {
   0% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(0.9); opacity: 0; }
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s $ease-smooth;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+  100% { transform: scale(0.8); opacity: 0; }
 }
 </style>

@@ -1,7 +1,6 @@
 package com.cardmanager.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -9,7 +8,6 @@ import java.time.LocalDateTime;
 /**
  * 公开查询卡密VO
  */
-@Data
 public class PublicCardVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -35,4 +33,36 @@ public class PublicCardVO implements Serializable {
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime useTime;
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
+    }
+
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
+
+    public LocalDateTime getUseTime() {
+        return useTime;
+    }
+
+    public void setUseTime(LocalDateTime useTime) {
+        this.useTime = useTime;
+    }
 }

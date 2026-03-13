@@ -1,7 +1,6 @@
 package com.cardmanager.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -9,7 +8,6 @@ import java.time.LocalDateTime;
 /**
  * 卡密批次实体
  */
-@Data
 @TableName("card_batch")
 public class CardBatch implements Serializable {
 
@@ -62,4 +60,76 @@ public class CardBatch implements Serializable {
      */
     @TableLogic
     private Integer isDeleted;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getBatchNumber() {
+        return batchNumber;
+    }
+
+    public void setBatchNumber(String batchNumber) {
+        this.batchNumber = batchNumber;
+    }
+
+    public Integer getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(Integer totalCount) {
+        this.totalCount = totalCount;
+    }
+
+    public Integer getUsedCount() {
+        return usedCount;
+    }
+
+    public void setUsedCount(Integer usedCount) {
+        this.usedCount = usedCount;
+    }
+
+    public Integer getRecycledCount() {
+        return recycledCount;
+    }
+
+    public void setRecycledCount(Integer recycledCount) {
+        this.recycledCount = recycledCount;
+    }
+
+    public Long getOperatorId() {
+        return operatorId;
+    }
+
+    public void setOperatorId(Long operatorId) {
+        this.operatorId = operatorId;
+    }
+
+    public String getOperatorName() {
+        return operatorName;
+    }
+
+    public void setOperatorName(String operatorName) {
+        this.operatorName = operatorName;
+    }
+
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
+
+    public Integer getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Integer isDeleted) {
+        this.isDeleted = isDeleted;
+    }
 }

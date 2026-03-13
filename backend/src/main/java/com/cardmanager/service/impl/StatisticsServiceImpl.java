@@ -6,16 +6,18 @@ import com.cardmanager.mapper.CardInfoMapper;
 import com.cardmanager.mapper.SysUserMapper;
 import com.cardmanager.service.StatisticsService;
 import com.cardmanager.vo.DashboardVO;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
  * 统计服务实现
  */
-@Slf4j
 @Service
 public class StatisticsServiceImpl implements StatisticsService {
+
+    private static final Logger log = LoggerFactory.getLogger(StatisticsServiceImpl.class);
 
     @Autowired
     private CardInfoMapper cardInfoMapper;

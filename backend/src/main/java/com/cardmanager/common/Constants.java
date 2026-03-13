@@ -85,6 +85,7 @@ public class Constants {
         public static final String GENERATE = "发卡";
         public static final String RECYCLE = "回收";
         public static final String VERIFY = "核销";
+        public static final String VERIFY_BATCH = "批量核销";
         public static final String ADD = "新增";
         public static final String UPDATE = "修改";
         public static final String DELETE = "删除";

@@ -1,14 +1,11 @@
 package com.cardmanager.dto;
 
-import lombok.Data;
-
 import javax.validation.constraints.Min;
 import java.io.Serializable;
 
 /**
  * 卡密查询DTO
  */
-@Data
 public class CardQueryDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -39,4 +36,44 @@ public class CardQueryDTO implements Serializable {
      */
     @Min(value = 1, message = "每页大小最小为1")
     private Integer pageSize = 10;
+
+    public String getBatchNumber() {
+        return batchNumber;
+    }
+
+    public void setBatchNumber(String batchNumber) {
+        this.batchNumber = batchNumber;
+    }
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Integer getPageNum() {
+        return pageNum;
+    }
+
+    public void setPageNum(Integer pageNum) {
+        this.pageNum = pageNum;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
 }

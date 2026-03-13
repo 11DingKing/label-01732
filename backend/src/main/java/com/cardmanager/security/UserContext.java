@@ -1,7 +1,5 @@
 package com.cardmanager.security;
 
-import lombok.Data;
-
 /**
  * 用户上下文（线程安全）
  */
@@ -72,7 +70,6 @@ public class UserContext {
     /**
      * 用户信息
      */
-    @Data
     public static class UserInfo {
         private Long userId;
         private String username;
@@ -83,6 +80,38 @@ public class UserContext {
             this.userId = userId;
             this.username = username;
             this.realName = realName;
+            this.role = role;
+        }
+
+        public Long getUserId() {
+            return userId;
+        }
+
+        public void setUserId(Long userId) {
+            this.userId = userId;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public String getRealName() {
+            return realName;
+        }
+
+        public void setRealName(String realName) {
+            this.realName = realName;
+        }
+
+        public String getRole() {
+            return role;
+        }
+
+        public void setRole(String role) {
             this.role = role;
         }
     }

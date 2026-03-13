@@ -11,16 +11,18 @@ import com.cardmanager.service.AuthService;
 import com.cardmanager.util.PasswordEncoder;
 import com.cardmanager.vo.LoginVO;
 import com.cardmanager.vo.UserVO;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
  * 认证服务实现
  */
-@Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
 
     @Autowired
     private SysUserMapper sysUserMapper;

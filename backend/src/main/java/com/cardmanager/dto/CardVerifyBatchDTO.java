@@ -1,26 +1,32 @@
 package com.cardmanager.dto;
 
-import javax.validation.constraints.NotBlank;
+import com.alibaba.excel.annotation.ExcelProperty;
+
 import java.io.Serializable;
 
 /**
- * 卡密核销DTO
+ * 批量卡密核销DTO - Excel导入使用
  */
-public class CardVerifyDTO implements Serializable {
+public class CardVerifyBatchDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
      * 卡号
      */
-    @NotBlank(message = "卡号不能为空")
+    @ExcelProperty(value = "卡号", index = 0)
     private String cardNumber;
 
     /**
      * 密码
      */
-    @NotBlank(message = "密码不能为空")
+    @ExcelProperty(value = "密码", index = 1)
     private String cardPassword;
+
+    /**
+     * 行号（用于标识Excel中的行）
+     */
+    private Integer rowNum;
 
     public String getCardNumber() {
         return cardNumber;
@@ -36,5 +42,13 @@ public class CardVerifyDTO implements Serializable {
 
     public void setCardPassword(String cardPassword) {
         this.cardPassword = cardPassword;
+    }
+
+    public Integer getRowNum() {
+        return rowNum;
+    }
+
+    public void setRowNum(Integer rowNum) {
+        this.rowNum = rowNum;
     }
 }
